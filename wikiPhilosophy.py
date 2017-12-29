@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup, SoupStrainer, Tag, NavigableString
 
 
 
-class getting_to_philosophy:
 
+class getting_to_philosophy:
    def __init__(self):
       self.div_id = "mw-content-text"
       self.content_tags = ['p', 'ul', 'ol']
@@ -25,8 +25,10 @@ class getting_to_philosophy:
 
 
    def set_page(self,url):
+
       self.url = url
       self.page = follow_url(self.url)
+
 
    def set_parser(self):
       strained = SoupStrainer('div', id=self.div_id)
@@ -70,6 +72,7 @@ class getting_to_philosophy:
 def remove_parenthesized_links(tag):
    without_parens = []
    in_parens = False
+
 
    subtree_list = tag_subtree_as_list(tag)
 
@@ -174,11 +177,9 @@ def create_connection(db_file):
     """ create a database connection to a SQLite database """
     try:
         conn = sqlite3.connect(db_file)
-        print("Connection created...")
         return conn
     except Error as e:
         print(e)
-        print("Error creating connection...")
 
     return None
 
@@ -187,10 +188,9 @@ def create_table(conn, create_table_sql):
     try:
         c = conn.cursor()
         c.execute(create_table_sql)
-        print("Table created...")
+
     except Error as e:
         print(e)
-        print("Error creating table...")
 
 # Insert paths and objects into Database
 def create_path(conn, paths):
@@ -223,45 +223,45 @@ def main(start_page_name, pathListString, hops):
 
 
 def hop_to_wiki_url(start_wiki_url, destination_wiki_url, limit):
-   start_page_name = return_wiki_page_name(start_wiki_url)
-   end_page_name = return_wiki_page_name(destination_wiki_url)
+    start_page_name = return_wiki_page_name(start_wiki_url)
+    end_page_name = return_wiki_page_name(destination_wiki_url)
 
-   pathList = [start_wiki_url]
-
-
-   if start_page_name == end_page_name:
-      print "Looks like we started at our destination page:",start_wiki_url
-      print "0 hops"
-      return
+    pathList = [start_wiki_url]
 
 
-   philosophy_links = getting_to_philosophy()
+    if start_page_name == end_page_name:
+       print "Looks like we started at our destination page:",start_wiki_url
+       print "0 hops"
+       return
 
 
-   next_url = philosophy_links.get_philosophy_link(start_wiki_url)
-
-   hops = 0
-   print start_wiki_url
-
-   while next_url != False and hops < limit:
-      print next_url
-      page_name = return_wiki_page_name(next_url)
-      pathList.append(next_url)
-      hops = hops + 1
-
-      if page_name == end_page_name:
-         print "Arrived."
-         print hops,"hops"
-         pathListString = ' '.join(pathList)
-         main(start_page_name,pathListString, hops)
-         return
-
-      next_url = philosophy_links.get_philosophy_link(next_url)
+    philosophy_links = getting_to_philosophy()
 
 
-   print "Looks like we hit our page-limit, a dead-end, a loop, or a bad link."
-   print "Unknown # hops."
-   return
+    next_url = philosophy_links.get_philosophy_link(start_wiki_url)
+
+    hops = 0
+    print start_wiki_url
+
+    while next_url != False and hops < limit:
+       print next_url
+       page_name = return_wiki_page_name(next_url)
+       pathList.append(next_url)
+       hops = hops + 1
+
+       if page_name == end_page_name:
+          print "Arrived."
+          print hops,"hops"
+          pathListString = ' '.join(pathList)
+          main(start_page_name,pathListString, hops)
+          return
+
+       next_url = philosophy_links.get_philosophy_link(next_url)
+
+
+    print "Looks like we hit our page-limit, a dead-end, a loop, or a bad link."
+    print "Unknown # hops."
+    return
 
 
 
